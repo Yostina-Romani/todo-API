@@ -118,7 +118,7 @@ DELETE /tasks/:id
 
 ## 📌 Future Improvements
 
-* Add database (MongoDB)
+* Add database (MySQL)
 * Add authentication
 * Better validation
 
