@@ -1,6 +1,7 @@
+
 # 📝 Todo API
 
-A simple RESTful API built with Node.js and Express.js to manage tasks (CRUD operations).
+A simple RESTful API built with Node.js, Express.js, and MySQL to manage tasks (CRUD operations).
 
 ---
 
@@ -10,6 +11,7 @@ A simple RESTful API built with Node.js and Express.js to manage tasks (CRUD ope
 * Get all tasks
 * Update a task
 * Delete a task
+* Data stored in **MySQL database**
 
 ---
 
@@ -17,6 +19,7 @@ A simple RESTful API built with Node.js and Express.js to manage tasks (CRUD ope
 
 * Node.js
 * Express.js
+* MySQL (MySQL Workbench)
 
 ---
 
@@ -26,33 +29,70 @@ A simple RESTful API built with Node.js and Express.js to manage tasks (CRUD ope
 todo_api/
 │── index.js
 │── package.json
+│── .gitignore
+```
+
+---
+
+## ⚙️ Database Setup (MySQL)
+
+1. Open **MySQL Workbench**
+2. Create a database:
+
+```sql
+CREATE DATABASE todo_api;
+```
+
+3. Create table:
+
+```sql
+USE todo_api;
+
+CREATE TABLE tasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  done BOOLEAN DEFAULT false
+);
+```
+
+---
+
+## 🔌 Database Connection (Node.js)
+
+Example connection in `index.js`:
+
+```js
+const mysql = require('mysql');
+
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'todo_api'
+});
+
+db.connect((err) => {
+  if (err) {
+    console.log('DB connection failed');
+  } else {
+    console.log('Connected to MySQL');
+  }
+});
 ```
 
 ---
 
 ## 📦 Installation
 
-1. Clone the repository:
-
 ```bash
 git clone https://github.com/Yostina-Romani/todo-API.git
-```
-
-2. Navigate to the project folder:
-
-```bash
 cd todo-API
-```
-
-3. Install dependencies:
-
-```bash
 npm install
 ```
 
 ---
 
-## ▶️ Run the Server
+## ▶️ Run Server
 
 ```bash
 node index.js
@@ -74,9 +114,7 @@ http://localhost:3000
 GET /tasks
 ```
 
----
-
-### 🔹 Create a task
+### 🔹 Create task
 
 ```
 POST /tasks
@@ -91,17 +129,13 @@ Body:
 }
 ```
 
----
-
-### 🔹 Update a task
+### 🔹 Update task
 
 ```
 PUT /tasks/:id
 ```
 
----
-
-### 🔹 Delete a task
+### 🔹 Delete task
 
 ```
 DELETE /tasks/:id
@@ -109,21 +143,14 @@ DELETE /tasks/:id
 
 ---
 
-## ⚠️ Notes
+## 📌 Notes
 
-* Data is stored in memory (no database yet)
-* All data will be lost when the server restarts
-
----
-
-## 📌 Future Improvements
-
-* Add database (MySQL)
-* Add authentication
-* Better validation
+* Data is now stored in **MySQL database**
+* Make sure MySQL service is running before starting server
 
 ---
 
 ## 👩‍💻 Author
 
 Yostina Romani
+---
