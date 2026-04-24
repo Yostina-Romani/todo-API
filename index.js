@@ -1,61 +1,87 @@
 const express=require('express');
 const app=express();
+const mysql=require('mysql2');
+const db=mysql.createConnection({
+    host:'localhost',
+    user:'root',
+    password: '',
+    database:'todo_api'
+});
+db.connect((err)=>{
+if(err){
+    console.log('connection failed',err);
+}
+else{
+    console.log('connected to mysql');
+}
+});
 app.use(express.json());
-let tasks=[];
+
 app.get('/',(req,res)=>{
 res.send("API is working");
 });
 app.post('/tasks',(req,res)=>{
-    if(!req.body||!req.body.title){
-        return res.status(400).json({
-            message:'invalid task'
+    const {title, status}=req.body;
+    const sql='insert into tasks (title,status_task) values(?,?)';
+    db.query(sql,[title,status],(err,result)=>{
+        if(err){
+            return res.status(500).json({
+                error:err.message
+                
+            });
+        }
+        res.status(201).json({
+            message:'task added',
+            id: result.insertId,
+             result
         });
-    }
-    const task={
-        id:Date.now(),
-        title:req.body.title,
-        done :req.body.done ||false
-    };
-    tasks.push(task);
-res.json({
-    message:'task was added',
-    task:task
-});
+    });
+ 
 });
 app.get('/tasks',(req,res)=>{
-    res.json(tasks);
+    const sql='select * from tasks';
+    db.query(sql,(err,result)=>{
+        if(err){
+            return res.status(500).json({
+                error:err.message
+            });
+        }
+        res.json({
+            result
+        });
+    });
 });
 app.delete('/tasks/:id',(req,res)=>{
     const id=Number(req.params.id);
-    if(!tasks.find(task=>task.id===id)){
-        return res.status(404).json({
-            message:"task not found"
+    const sql ='delete from tasks where id=?';
+    db.query(sql,[id],(err,result)=>{
+     if(err){
+        return res.status(500).json({
+            error:err.message
         });
-    }
-    
-    tasks=tasks.filter(task=>task.id!==id);
-    res.json({
-        message:"task was deleted",
-        tasks
+     }
+     res.json({
+        message:'task deleted',
+        result
+     });
     });
+    
+    
 });
 app.put('/tasks/:id',(req,res)=>{
 const id=Number(req.params.id);
-const task=tasks.find( t => t.id===id);
-if(!task){
-  return  res.status(404).json({
-        message:" task not found "
+const {title,status}=req.body;
+const sql='update tasks set title=? , status_task = ? where id=?';
+db.query(sql,[title,status,id],(err,result)=>{
+    if(err){
+        return res.status(500).json({
+            error :err.message
+        });
+    }
+    res.json({
+      message:'task updated',
+      result
     });
-}
-if(req.body.title!==undefined){
-    task.title=req.body.title;
-}
-if(req.body.done!==undefined){
-    task.done=req.body.done;
-}
-res.json({
-    message:"task updated",
-    task
 });
 });
 app.listen(3000,()=>{
